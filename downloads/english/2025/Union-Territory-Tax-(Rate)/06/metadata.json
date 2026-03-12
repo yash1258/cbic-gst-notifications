@@ -1,0 +1,16 @@
+{
+  "id": 1010306,
+  "notification_no": "06/2025-Union Territory Tax (Rate)",
+  "date": "2025-01-31",
+  "category": "Union Territory Tax (Rate)",
+  "subject": "To replace the entry in the column 3 of the table with the entry as stated in the notification of 06/2025 - Central Tax (Rate).",
+  "language": "english",
+  "available": false,
+  "files": {
+    "english": null,
+    "hindi": "06-2025-Union-Territory-Tax-Rate.pdf"
+  },
+  "hindi_id": 1010306,
+  "missing_reason": "hindi_only_corrigendum",
+  "notes": "This notification was published only in Hindi as a corrigendum (correction). No English version exists in the CBIC system."
+}
