@@ -21,3 +21,9 @@ ENV/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Data & Downloads
+data/
+downloads/
+*.json
+!analysis_report.json
