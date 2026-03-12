@@ -5,11 +5,12 @@
   "category": "Compensation Cess (Rate)",
   "subject": "\nSeeks to amend Notification No. 1/2017- Compensation Cess (Rate) dated 28.06.2017.",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "02-2025-Compensation-Cess-Rate.pdf",
+    "english": null,
     "hindi": "02-2025-Compensation-Cess-Rate.pdf"
   },
   "hindi_id": 1010449,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }

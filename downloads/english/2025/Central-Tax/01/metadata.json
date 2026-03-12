@@ -5,11 +5,12 @@
   "category": "Central Tax",
   "subject": "Seeks to extend the due date for furnishing FORM GSTR-1 for the month of December, 2024 and the quarter of October to December, 2024, as the case may be",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "01-2025-Central-Tax.pdf",
+    "english": null,
     "hindi": "01-2025-Central-Tax.pdf"
   },
   "hindi_id": 1010249,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }

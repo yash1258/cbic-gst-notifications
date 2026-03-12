@@ -5,11 +5,12 @@
   "category": "Central Tax",
   "subject": "Seeks to notify supplies under section 15(5) of CGST Act for valuation based on Retail sale price (RSP)",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "19-2025-Central-Tax.pdf",
+    "english": null,
     "hindi": "19-2025-Central-Tax.pdf"
   },
   "hindi_id": 1010545,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }

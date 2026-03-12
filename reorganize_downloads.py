@@ -43,13 +43,13 @@ def get_pdf_info(notification):
     }
 
 
-def reorganize_english():
+def reorganize_english(year=2025):
     """Move existing English PDFs to english/ folder and create metadata."""
     
-    print("Reorganizing English PDFs...")
+    print(f"Reorganizing English PDFs for year {year}...")
     
-    # Load 2025 metadata
-    with open(f"{METADATA_DIR}/2025.json", "r", encoding="utf-8") as f:
+    # Load metadata for specified year
+    with open(f"{METADATA_DIR}/{year}.json", "r", encoding="utf-8") as f:
         data = json.load(f)
         notifications = data.get("notifications", [])
     
@@ -118,15 +118,15 @@ def reorganize_english():
     print(f"Created metadata.json in each folder")
 
 
-def cleanup_old_structure():
+def cleanup_old_structure(year=2025):
     """Remove old directory structure after reorganization."""
-    old_year_dir = f"{DOWNLOAD_DIR}/2025"
+    old_year_dir = f"{DOWNLOAD_DIR}/{year}"
     if os.path.exists(old_year_dir):
         shutil.rmtree(old_year_dir)
         print(f"Cleaned up old structure: {old_year_dir}")
     
     # Also remove progress/error files from root of downloads
-    for fname in ["progress_2025.json", "errors_2026.json"]:
+    for fname in [f"progress_{year}.json", f"errors_{year}.json"]:
         fpath = f"{DOWNLOAD_DIR}/{fname}"
         if os.path.exists(fpath):
             os.remove(fpath)
@@ -134,15 +134,18 @@ def cleanup_old_structure():
 
 
 if __name__ == "__main__":
+    import sys
+    year = int(sys.argv[1]) if len(sys.argv) > 1 else 2025
+    
     print("=" * 60)
-    print("Reorganizing Downloads for AI Agent Compatibility")
+    print(f"Reorganizing Downloads for AI Agent Compatibility ({year})")
     print("=" * 60)
     print()
     
-    reorganize_english()
+    reorganize_english(year)
     print()
     
-    cleanup_old_structure()
+    cleanup_old_structure(year)
     print()
     
     print("=" * 60)
@@ -150,8 +153,8 @@ if __name__ == "__main__":
     print("=" * 60)
     print()
     print("New structure:")
-    print("  downloads/english/2025/Central-Tax/01/")
-    print("    - 01-2025-Central-Tax.pdf")
+    print(f"  downloads/english/{year}/Central-Tax/01/")
+    print(f"    - 01-{year}-Central-Tax.pdf")
     print("    - metadata.json")
     print()
     print("Next: Run download_hindi.py to add Hindi PDFs")

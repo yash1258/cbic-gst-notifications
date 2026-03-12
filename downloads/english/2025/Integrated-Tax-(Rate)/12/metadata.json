@@ -5,11 +5,12 @@
   "category": "Integrated Tax (Rate)",
   "subject": "Seeks to amend Notification No. 9/2018- -Integrated Tax (Rate) dated 25.01.2018.",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "12-2025--Integrated-Tax-Rate.pdf",
+    "english": null,
     "hindi": "12-2025--Integrated-Tax-Rate.pdf"
   },
   "hindi_id": 1010434,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }

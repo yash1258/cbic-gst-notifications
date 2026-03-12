@@ -5,11 +5,12 @@
   "category": "Central Tax",
   "subject": "Seeks to extend the due date for furnishing FORM GSTR-3B for the month of July,2025 upto 27.08.2025, for the taxpayers registered in Mumbai (City), Mumbai (sub-urban), Thane, Raigad and Palghar districts of Maharashtra",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "12-2025-Central-Tax.pdf",
+    "english": null,
     "hindi": "12-2025-Central-Tax.pdf"
   },
   "hindi_id": 1010424,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }

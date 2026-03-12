@@ -5,11 +5,12 @@
   "category": "Central Tax (Rate)",
   "subject": "Seeks to amend Notification no. 01/2017- Central Tax (Rate)",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "01-2025-Central-Tax-Rate.pdf",
+    "english": null,
     "hindi": "01-2025-Central-Tax-Rate.pdf"
   },
   "hindi_id": 1010258,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }

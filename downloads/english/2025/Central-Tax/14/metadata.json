@@ -5,11 +5,12 @@
   "category": "Central Tax",
   "subject": "Seeks to notify category of persons under section 54(6).",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "14-2025-Central-Tax.pdf",
+    "english": null,
     "hindi": "14-2025-Central-Tax.pdf"
   },
   "hindi_id": 1010464,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }

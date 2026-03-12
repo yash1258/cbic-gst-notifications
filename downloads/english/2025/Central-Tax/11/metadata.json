@@ -5,11 +5,12 @@
   "category": "Central Tax",
   "subject": "Seeks to notify Central Goods and Services Tax (Second Amendment) Rules 2025",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "11-2025-Central-Tax.pdf",
+    "english": null,
     "hindi": "11-2025-Central-Tax.pdf"
   },
   "hindi_id": 1010338,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }

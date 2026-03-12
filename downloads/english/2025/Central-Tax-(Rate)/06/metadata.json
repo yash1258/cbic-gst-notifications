@@ -5,11 +5,12 @@
   "category": "Central Tax (Rate)",
   "subject": "Seeks to amend Notification No 12/2017-Central Tax (Rate dated 28th June, 2017 to implement the recommendations of the 55th GST Council.",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "06-2025-Central-Tax-Rate.pdf",
+    "english": null,
     "hindi": "06-2025-Central-Tax-Rate.pdf"
   },
   "hindi_id": 1010274,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }

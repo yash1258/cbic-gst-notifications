@@ -5,11 +5,12 @@
   "category": "Union Territory Tax (Rate)",
   "subject": "Seeks to amend Notification No 17/2017-Union Territory (Rate),   dated 28th June, 2017 to implement the recommendations of the 55th GST Council..",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "08-2025-Union-Territory-Tax-Rate.pdf",
+    "english": null,
     "hindi": "08-2025-Union-Territory-Tax-Rate.pdf"
   },
   "hindi_id": 1010284,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }

@@ -5,11 +5,12 @@
   "category": "Central Tax",
   "subject": "Central Tax Notification for waiver of the late fee",
   "language": "english",
-  "available": true,
+  "available": false,
   "files": {
-    "english": "08-2025-Central-Tax.pdf",
+    "english": null,
     "hindi": "08-2025-Central-Tax.pdf"
   },
   "hindi_id": 1010288,
-  "missing_reason": null
+  "missing_reason": "not_found",
+  "notes": "English PDF not found on server (may not exist or server error)."
 }
