@@ -5,12 +5,12 @@
   "category": "Integrated Tax (Rate)",
   "subject": "To replace “ पैराग्राफ 4” with “पैराग्राफ 5”.",
   "language": "english",
-  "available": false,
+  "available": true,
   "files": {
-    "english": null,
+    "english": "08-2025-Integrated-Tax-Rate.pdf",
     "hindi": "08-2025--Integrated-Tax-Rate.pdf"
   },
   "hindi_id": 1010305,
-  "missing_reason": "hindi_only_corrigendum",
-  "notes": "This notification was published only in Hindi as a corrigendum (correction). No English version exists in the CBIC system."
+  "missing_reason": null,
+  "notes": null
 }

@@ -5,12 +5,12 @@
   "category": "Central Tax (Rate)",
   "subject": "Corrigendum to Notification No. 10/2025 – Central Tax (Rate) dated 17.09.2025",
   "language": "english",
-  "available": false,
+  "available": true,
   "files": {
-    "english": null,
+    "english": "Corrigendum.pdf",
     "hindi": "Corrigendum.pdf"
   },
   "hindi_id": 1010472,
-  "missing_reason": "hindi_only_corrigendum",
-  "notes": "This notification was published only in Hindi as a corrigendum (correction). No English version exists in the CBIC system."
+  "missing_reason": null,
+  "notes": null
 }

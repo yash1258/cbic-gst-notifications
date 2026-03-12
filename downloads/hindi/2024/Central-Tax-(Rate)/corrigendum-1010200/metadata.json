@@ -4,12 +4,11 @@
   "date": "2024-10-22",
   "category": "Central Tax (Rate)",
   "subject": "To read any immovable property for any property, as mentioned in Notification No. 09/2024-CT(R)",
-  "language": "english",
+  "language": "hindi",
   "available": true,
   "files": {
-    "english": "Corrigendum.pdf",
     "hindi": "Corrigendum.pdf"
   },
-  "hindi_id": 1010200,
-  "missing_reason": null
+  "english_id": 1010200,
+  "notes": null
 }

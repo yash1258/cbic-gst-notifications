@@ -5,12 +5,12 @@
   "category": "Central Tax",
   "subject": "Seeks to bring rules 2, 8, 24, 27, 32, 37, 38 of the CGST (Amendment) Rules, 2024 in to force",
   "language": "english",
-  "available": false,
+  "available": true,
   "files": {
-    "english": null,
+    "english": "09-2025-Central-Tax.pdf",
     "hindi": "09-2025-Central-Tax.pdf"
   },
   "hindi_id": 1010314,
-  "missing_reason": "not_found",
-  "notes": "English PDF not found on server (may not exist or server error)."
+  "missing_reason": null,
+  "notes": null
 }
