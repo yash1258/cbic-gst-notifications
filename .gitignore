@@ -15,10 +15,6 @@ ENV/
 *.swp
 *.swo
 
-# Large data files (exclude raw data, keep scripts)
-data/
-*.json
-
 # Logs
 *.log
 
