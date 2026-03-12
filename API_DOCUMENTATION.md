@@ -174,8 +174,53 @@ with open("notification.pdf", "wb") as f:
 
 **Notes:**
 - PDFs are typically 50KB-500KB in size
-- Hindi PDFs (`HIN`) may return 500 error for some notifications
 - The base64 string can be very long (hundreds of KB)
+
+---
+
+### 4. Download Hindi PDF
+
+Downloads the Hindi version of the PDF document.
+
+**Endpoint:** `GET /api/cbic-notification-msts/download/{id}/HINDI`
+
+**Parameters:**
+- `id` (path, integer): Database ID of the notification
+- `language` (path, string): `HINDI` (not `HIN`)
+
+**Response (200 OK):**
+```json
+{
+  "data": "JVBERi0xLjcKCjQgMCBvYmoKKElkZW50aXR5KQplbmRvYmo..."
+}
+```
+
+Same base64-encoded format as English endpoint.
+
+**Response Codes:**
+- `200` - Success, Hindi PDF available
+- `500` - Server error (PDF may not exist for this notification)
+- `404` - Notification not found
+
+**Key Differences from English:**
+- Language code is `HINDI` (not `HIN` or `HI`)
+- **All 2025 notifications have Hindi versions** (93/93 successful)
+- Some notifications are **Hindi-only** (no English version exists)
+  - These are typically corrigenda (corrections to Hindi text)
+  - Example IDs: 1010304, 1010305, 1010306, 1010308, 1010309, 1010310, 1010472
+
+**Usage Pattern:**
+```python
+# Download both languages for a notification
+english_url = f"/api/cbic-notification-msts/download/{id}/ENG"
+hindi_url = f"/api/cbic-notification-msts/download/{id}/HINDI"
+
+# Try English first
+response = requests.get(english_url)
+if response.status_code == 500:
+    # Fall back to Hindi
+    response = requests.get(hindi_url)
+```
 
 ---
 
@@ -335,6 +380,12 @@ They appear to be administrative/internal endpoints not intended for public acce
 ---
 
 ## Changelog
+
+**v1.1 - March 13, 2026**
+- Added Hindi PDF download endpoint (`/HINDI`)
+- Documented Hindi-only notifications (corrigenda)
+- Added language code clarification (use `HINDI`, not `HIN`)
+- Updated download statistics (93/93 Hindi PDFs available for 2025)
 
 **v1.0 - March 13, 2026**
 - Initial documentation
