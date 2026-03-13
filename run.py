@@ -15,6 +15,11 @@ from src.gst.notifications.organizer import GstNotificationOrganizer
 from src.gst.notifications.downloader import GstNotificationDownloader
 from src.gst.notifications.analyzer import GstNotificationAnalyzer
 
+from src.gst.circulars.scraper import GstCircularScraper
+from src.gst.circulars.organizer import GstCircularOrganizer
+from src.gst.circulars.downloader import GstCircularDownloader
+from src.gst.circulars.analyzer import GstCircularAnalyzer
+
 
 def run_scrape(args):
     """Scrapes raw DB metadata from endpoints."""
@@ -53,6 +58,40 @@ def run_analyze(args):
     if results:
         print(json.dumps(results, indent=2))
 
+def run_scrape_circ(args):
+    scraper = GstCircularScraper()
+    asyncio.run(scraper.run())
+
+def run_organize_circ(args):
+    organizer = GstCircularOrganizer()
+    organizer.run()
+
+def run_download_circ(args):
+    year = args.year
+    lang = args.language.upper()
+    
+    if lang not in ["ENG", "HINDI", "BOTH"]:
+        print("Language must be 'ENG', 'HINDI', or 'BOTH'.")
+        return
+        
+    print(f"Beginning PDF extraction for Circulars {year} | Language: {lang}")
+    
+    def dl_lang(l):
+        dl = GstCircularDownloader(year, l)
+        asyncio.run(dl.run())
+        
+    if lang in ["ENG", "BOTH"]:
+        dl_lang("ENG")
+    if lang in ["HINDI", "BOTH"]:
+        dl_lang("HINDI")
+
+def run_analyze_circ(args):
+    """Analyzes completeness of the circular data against the DB metadata."""
+    analyzer = GstCircularAnalyzer(args.year)
+    results = analyzer.run()
+    if results:
+        print(json.dumps(results, indent=2))
+
 def main():
     parser = argparse.ArgumentParser(description="CBIC Tax Metadata Extractor")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -77,7 +116,24 @@ def main():
     parser_analyze.add_argument("year", type=str, help="Year to check (e.g. 2024)")
     parser_analyze.set_defaults(func=run_analyze)
 
-    # Future hooks: "circulars", "forms", "customs" would become their own top-level subparsers here.
+    # Circulars
+    parser_scrape_circ = subparsers.add_parser("scrape-circ", help="Fetch circular metadata from CBIC APIs")
+    parser_scrape_circ.set_defaults(func=run_scrape_circ)
+
+    parser_organize_circ = subparsers.add_parser("organize-circ", help="Sort the raw API data for circulars into Years")
+    parser_organize_circ.set_defaults(func=run_organize_circ)
+
+    parser_download_circ = subparsers.add_parser("download-circ", help="Download Circular PDFs by Year")
+    parser_download_circ.add_argument("year", type=str, help="Year to download (e.g. 2024)")
+    parser_download_circ.add_argument("--language", "-l", type=str, default="BOTH", 
+                               help="Language 'ENG', 'HINDI', or 'BOTH' (default)")
+    parser_download_circ.set_defaults(func=run_download_circ)
+
+    parser_analyze_circ = subparsers.add_parser("analyze-circ", help="Verify completeness of circular downloads for a Year")
+    parser_analyze_circ.add_argument("year", type=str, help="Year to check (e.g. 2024)")
+    parser_analyze_circ.set_defaults(func=run_analyze_circ)
+
+    # Future hooks: "forms", "customs" would become their own top-level subparsers here.
 
     args = parser.parse_args()
     

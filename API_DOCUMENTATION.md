@@ -50,8 +50,11 @@ Retrieves complete metadata for a specific notification by ID.
 
 **Endpoint:** `GET /api/cbic-notification-msts/{id}`
 
+**Related Endpoint (Circulars):** `GET /api/cbic-circular-msts/{id}`
+Returns similar structure for Circulars instead of Notifications.
+
 **Parameters:**
-- `id` (path, integer): Database ID of the notification (range: 1000001-1010588)
+- `id` (path, integer): Database ID of the notification (range: 1000001-1010588) or circular (range: 1000001-1004000)
 
 **Response (200 OK):**
 ```json
@@ -133,11 +136,13 @@ Retrieves complete metadata for a specific notification by ID.
 
 ---
 
-### 3. Download Notification PDF
+### 3. Download PDF (English)
 
-Downloads the PDF document for a notification (base64-encoded).
+Downloads the PDF document (base64-encoded).
 
 **Endpoint:** `GET /api/cbic-notification-msts/download/{id}/{language}`
+
+**Related Circulars Endpoint:** `GET /api/cbic-circular-msts/download/{id}/{language}`
 
 **Parameters:**
 - `id` (path, integer): Database ID of the notification
