@@ -3,13 +3,13 @@
 **Base URL:** `https://taxinformation.cbic.gov.in`  
 **Authentication:** None required (public endpoints)  
 **SSL Certificate:** Self-signed (disable verification)  
-**Last Updated:** March 13, 2026  
+**Last Updated:** March 14, 2026  
 
 ---
 
 ## Overview
 
-This document describes the public REST API endpoints discovered for the CBIC (Central Board of Indirect Taxes and Customs) Tax Information Portal. These endpoints provide access to GST, Customs, and Central Excise notifications, circulars, and related documents.
+This document describes the public REST API endpoints discovered for the CBIC (Central Board of Indirect Taxes and Customs) Tax Information Portal. These endpoints provide access to GST, Customs, and Central Excise notifications, circulars, orders, instructions, and forms.
 
 **Tax Type IDs:**
 - `1000001` - GST (Goods and Services Tax)
@@ -229,6 +229,59 @@ if response.status_code == 500:
 
 ---
 
+### 5. Orders API
+
+**Metadata Endpoint:** `GET /api/cbic-order-msts/{id}`  
+**Download Endpoint:** `GET /api/cbic-order-msts/download/{id}/{language}`
+
+Same structure as Notifications. Orders use `orderNo`, `orderDt`, `orderName`, `orderCategory`.
+
+**ID Range:** 1000001–1005000 (GST: 39 orders, 2017–2022)  
+**Categories:** Order-CGST, Order-UTSGT, Removal of Difficulty - CGST, Removal of Difficulty - UTGST
+
+---
+
+### 6. Instructions API
+
+**Metadata Endpoint:** `GET /api/cbic-instruction-msts/{id}`  
+**Download Endpoint:** `GET /api/cbic-instruction-msts/download/{id}/{language}`
+
+Same structure as above. Instructions use `instructionNo`, `instructionDt`, `instructionName`, `instructionCategory`, `insYear`.
+
+**ID Range:** 1000001–1005000  
+- GST (tax.id=1000001): 42 instructions (2019–2025)  
+- Customs (tax.id=1000002): 393 instructions (2004–2026)
+
+---
+
+### 7. Forms API (Bulk Fetch)
+
+Forms use a **different pattern** — a single call returns all forms for a tax type.
+
+**List Categories:** `GET /api/cbic-form-msts/fetchFormsCategory/{taxId}`  
+**Fetch All Forms:** `GET /api/cbic-form-msts/fetchForms/{taxId}`  
+**Filter by Category:** `GET /api/cbic-form-msts/findFormByFormCategory/{taxId}/{categoryName}`  
+**Download PDF:** `GET /api/cbic-form-msts/download/{id}`
+
+**Key Differences from other endpoints:**
+- No sequential ID scanning needed — bulk fetch returns all records
+- No language parameter on download — forms are English-only
+- Organized by `formCategory` instead of date
+- Download response: `{"data": "base64...", "fileName": "FORM GST CMP-01.pdf"}`
+- Some forms return empty `fileName` (especially GST Amnesty Scheme 2024)
+
+**GST Forms (taxId=1000001):** 197 forms, 21 categories, IDs 1000019–1000405
+
+| Category | Count |
+|---|---|
+| Registration | 33 |
+| Demand and Recovery Forms | 31 |
+| Return | 22 |
+| Assessment | 18 |
+| Refund | 16 |
+| Appeal | 12 |
+| Other (15 categories) | 65 |
+
 ## ID Range Information
 
 ### Valid Notification IDs
@@ -297,11 +350,19 @@ Since IDs span a wide range without date ordering:
 
 ## Data Collection Statistics
 
-**Scan Date:** March 13, 2026  
-**Total IDs Scanned:** 10,588  
-**GST Notifications Found (2017+):** 1,281  
-**Errors Encountered:** 0  
-**Success Rate:** 100%
+**Scan Date:** March 14, 2026  
+**Total Documents Indexed:** 11,855
+
+| Data Type | Count | Method |
+|---|---|---|
+| GST Notifications | 1,281 | ID scan 1M–10.6K |
+| GST Circulars | 271 | ID scan 1M–4K |
+| GST Orders | 39 | ID scan 1M–5K |
+| GST Instructions | 42 | ID scan 1M–5K |
+| GST Forms | 197 | Bulk API |
+| Customs Notifications | 6,872 | ID scan 1M–10.6K |
+| Customs Circulars | 1,760 | ID scan 1M–4K |
+| Customs Instructions | 393 | ID scan 1M–5K |
 
 **Collection Method:**
 - Async concurrent scanning (5 connections)
@@ -385,6 +446,13 @@ They appear to be administrative/internal endpoints not intended for public acce
 ---
 
 ## Changelog
+
+**v1.2 - March 14, 2026**
+- Added Orders API endpoint (`/api/cbic-order-msts/`)
+- Added Instructions API endpoint (`/api/cbic-instruction-msts/`)
+- Added Forms API endpoints (bulk fetch pattern: `/api/cbic-form-msts/`)
+- Updated statistics: 11,855 total documents across GST + Customs
+- Documented empty-fileName edge case for Forms download
 
 **v1.1 - March 13, 2026**
 - Added Hindi PDF download endpoint (`/HINDI`)
