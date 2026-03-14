@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBIC Tax Information Portal — API Reference</title>
+<meta name="description" content="Complete API documentation for the CBIC Tax Information Portal, covering GST Acts, Rules, Notifications, Circulars, Orders, Instructions, Forms, and Cross-References.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #141210;
+  --bg-secondary: #1a1816;
+  --bg-card: #211f1b;
+  --bg-card-hover: #2a2723;
+  --bg-code: #181614;
+  --border: rgba(180, 155, 110, 0.14);
+  --border-active: rgba(200, 165, 100, 0.35);
+  --text-primary: #e8e4de;
+  --text-secondary: #9e9689;
+  --text-muted: #706a5f;
+  --accent: #c8a55a;
+  --accent-glow: rgba(200, 165, 90, 0.1);
+  --green: #8fad6a;
+  --orange: #c89450;
+  --red: #c76a5e;
+  --purple: #a68db8;
+  --cyan: #a0b8a0;
+  --sidebar-w: 280px;
+  --header-h: 64px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 24px); }
+
+body {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Header ─── */
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--header-h);
+  background: rgba(20, 18, 16, 0.9);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 32px;
+}
+.header-logo {
+  font-size: 18px; font-weight: 700; letter-spacing: -0.03em;
+  color: var(--accent);
+}
+.header-badge {
+  margin-left: 12px; padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  background: var(--accent-glow); color: var(--accent);
+  border: 1px solid var(--border-active);
+}
+.header-meta {
+  margin-left: auto; color: var(--text-muted); font-size: 13px;
+}
+.menu-toggle {
+  display: none; background: none; border: none; color: var(--text-primary);
+  font-size: 24px; cursor: pointer; margin-right: 16px;
+}
+
+/* ─── Sidebar ─── */
+.sidebar {
+  position: fixed; top: var(--header-h); left: 0; bottom: 0;
+  width: var(--sidebar-w); padding: 24px 0;
+  overflow-y: auto; background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.sidebar-group { margin-bottom: 8px; }
+.sidebar-group-title {
+  padding: 6px 24px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+.sidebar a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 24px; font-size: 13.5px; font-weight: 450;
+  color: var(--text-secondary); text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+.sidebar a:hover {
+  color: var(--text-primary); background: rgba(200,165,90,0.05);
+}
+.sidebar a.active {
+  color: var(--accent); border-left-color: var(--accent);
+  background: var(--accent-glow); font-weight: 600;
+}
+.sidebar a .icon { font-size: 16px; width: 20px; text-align: center; }
+
+/* ─── Main ─── */
+.main {
+  margin-left: var(--sidebar-w); margin-top: var(--header-h);
+  padding: 48px 56px 120px;
+  max-width: 900px;
+}
+
+/* ─── Hero ─── */
+.hero {
+  margin-bottom: 64px; padding-bottom: 48px;
+  border-bottom: 1px solid var(--border);
+}
+.hero h1 {
+  font-size: 40px; font-weight: 800; letter-spacing: -0.03em;
+  line-height: 1.15; margin-bottom: 16px;
+  color: var(--text-primary);
+}
+.hero p { font-size: 17px; color: var(--text-secondary); max-width: 600px; }
+.hero-meta {
+  display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px;
+}
+.hero-meta-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; border-radius: 10px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  font-size: 13px; color: var(--text-secondary);
+}
+.hero-meta-item span { color: var(--text-primary); font-weight: 600; }
+
+/* ─── Sections ─── */
+section { margin-bottom: 56px; }
+section[id] { scroll-margin-top: calc(var(--header-h) + 24px); }
+
+h2 {
+  font-size: 26px; font-weight: 700; letter-spacing: -0.02em;
+  margin-bottom: 8px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+h2 .section-icon { font-size: 22px; }
+
+h3 {
+  font-size: 18px; font-weight: 600; margin: 32px 0 12px;
+  color: var(--accent); letter-spacing: -0.01em;
+}
+
+p { margin-bottom: 14px; color: var(--text-secondary); }
+
+/* ─── Cards ─── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px;
+  margin: 20px 0;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  border-color: var(--border-active);
+  box-shadow: 0 0 30px var(--accent-glow);
+}
+.card-title {
+  font-size: 14px; font-weight: 600; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title .badge {
+  padding: 2px 8px; border-radius: 6px; font-size: 11px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.badge-get { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-post { background: rgba(200,165,90,0.12); color: var(--accent); }
+
+/* ─── Endpoint Blocks ─── */
+.endpoint {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px 24px; margin: 16px 0;
+  font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+  display: flex; align-items: center; gap: 12px;
+  transition: all 0.2s ease; cursor: default;
+}
+.endpoint:hover { border-color: var(--border-active); background: var(--bg-card-hover); }
+.endpoint .method {
+  padding: 4px 10px; border-radius: 6px; font-size: 11px;
+  font-weight: 700; letter-spacing: 0.04em; flex-shrink: 0;
+}
+.endpoint .method-get { background: rgba(63,185,80,0.15); color: var(--green); }
+.endpoint .method-post { background: rgba(200,165,90,0.12); color: var(--accent); }
+.endpoint .path { color: var(--cyan); word-break: break-all; }
+.endpoint .path .param { color: var(--orange); }
+
+/* ─── Code Blocks ─── */
+pre {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  overflow-x: auto;
+  margin: 16px 0;
+  position: relative;
+}
+pre code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; line-height: 1.65;
+  color: var(--text-primary);
+}
+.code-label {
+  position: absolute; top: 10px; right: 14px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+}
+.str { color: #b5c7a3; }
+.key { color: var(--accent); }
+.num { color: #c89450; }
+.bool { color: var(--orange); }
+.null { color: var(--text-muted); font-style: italic; }
+.comment { color: var(--text-muted); font-style: italic; }
+
+/* ─── Tables ─── */
+.table-wrap { overflow-x: auto; margin: 16px 0; border-radius: 12px; border: 1px solid var(--border); }
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13.5px;
+}
+thead th {
+  text-align: left; padding: 12px 18px;
+  background: var(--bg-card); font-weight: 600; font-size: 12px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-muted); border-bottom: 1px solid var(--border);
+}
+tbody td {
+  padding: 11px 18px; border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(200,165,90,0.03); }
+td code {
+  font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+  background: var(--bg-code); padding: 2px 7px; border-radius: 5px;
+  color: var(--cyan);
+}
+
+/* ─── Diagram ─── */
+.diagram-container {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 32px; margin: 24px 0;
+  text-align: center;
+}
+.diagram-container svg { max-width: 100%; }
+.diagram-node {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 10px; margin: 6px;
+  font-size: 13px; font-weight: 600;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease; cursor: default;
+}
+.diagram-node:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.node-legislative { background: rgba(63,185,80,0.1); color: var(--green); border-color: rgba(63,185,80,0.25); }
+.node-regulatory { background: rgba(210,153,34,0.1); color: var(--orange); border-color: rgba(210,153,34,0.25); }
+.node-procedural { background: rgba(166,141,184,0.1); color: var(--purple); border-color: rgba(166,141,184,0.25); }
+.node-hub { background: rgba(200,165,90,0.1); color: var(--accent); border-color: rgba(200,165,90,0.25); }
+
+/* ─── Graph Visual ─── */
+.graph-visual {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 40px 32px; margin: 24px 0;
+  position: relative; overflow: hidden;
+}
+.graph-visual::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, var(--accent-glow) 0%, transparent 70%);
+  opacity: 0.3;
+}
+.graph-center {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+}
+.graph-row {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+}
+.graph-hub {
+  padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 700;
+  background: rgba(200,165,90,0.08);
+  border: 1px solid var(--border-active);
+  color: var(--text-primary);
+}
+.graph-connector {
+  width: 2px; height: 24px;
+  background: linear-gradient(180deg, var(--accent), transparent);
+}
+.graph-branch-line {
+  height: 2px; width: 80%; max-width: 500px;
+  background: linear-gradient(90deg, transparent, var(--border-active), transparent);
+}
+
+/* ─── Callouts ─── */
+.callout {
+  border-radius: 10px; padding: 16px 20px; margin: 16px 0;
+  font-size: 13.5px; display: flex; gap: 12px;
+  border: 1px solid;
+}
+.callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.callout-note { background: rgba(200,165,90,0.06); border-color: rgba(200,165,90,0.2); color: var(--text-secondary); }
+.callout-warn { background: rgba(210,153,34,0.06); border-color: rgba(210,153,34,0.2); color: var(--text-secondary); }
+
+/* ─── Flow Diagram ─── */
+.flow {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap; margin: 12px 0;
+}
+.flow-step {
+  padding: 6px 14px; border-radius: 8px;
+  font-size: 12.5px; font-weight: 600;
+  background: var(--bg-card); border: 1px solid var(--border);
+}
+.flow-arrow { color: var(--text-muted); font-size: 16px; }
+
+/* ─── Animations ─── */
+.fade-in {
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── Responsive ─── */
+@media (max-width: 860px) {
+  .sidebar { transform: translateX(-100%); z-index: 99; }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; padding: 32px 20px 120px; }
+  .menu-toggle { display: block; }
+  .hero h1 { font-size: 28px; }
+  h2 { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle menu">☰</button>
+  <div class="header-logo">CBIC API</div>
+  <span class="header-badge">v2.0</span>
+  <div class="header-meta">taxinformation.cbic.gov.in</div>
+</header>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Overview</div>
+    <a href="#overview"><span class="icon">🏗️</span> Data Model</a>
+    <a href="#content-ids"><span class="icon">🔑</span> Content IDs</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Legislative</div>
+    <a href="#acts"><span class="icon">📜</span> Acts</a>
+    <a href="#rules"><span class="icon">📏</span> Rules</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Regulatory</div>
+    <a href="#notifications"><span class="icon">📋</span> Notifications</a>
+    <a href="#forms"><span class="icon">📑</span> Forms</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Interconnections</div>
+    <a href="#cross-ref"><span class="icon">🔗</span> Cross-Reference API</a>
+    <a href="#discovery"><span class="icon">🔍</span> Discovery Patterns</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">Reference</div>
+    <a href="#implementation"><span class="icon">⚙️</span> Implementation</a>
+    <a href="#statistics"><span class="icon">📊</span> Statistics</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- Hero -->
+  <div class="hero fade-in">
+    <h1>CBIC Tax Information Portal API</h1>
+    <p>Complete reference for the public REST API powering India's tax information system — covering Acts, Rules, Notifications, Circulars, Orders, Instructions, Forms, and their cross-references.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">🌐 Base URL <span>taxinformation.cbic.gov.in</span></div>
+      <div class="hero-meta-item">🔓 Auth <span>None</span></div>
+      <div class="hero-meta-item">🔒 SSL <span>Self-signed</span></div>
+      <div class="hero-meta-item">📄 Format <span>JSON + HTML</span></div>
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <section id="overview" class="fade-in">
+    <h2><span class="section-icon">🏗️</span> Data Model Overview</h2>
+    <p>The CBIC portal organizes Indian tax law into a <strong>hierarchical graph</strong> of interconnected document types. Every document is scoped under a Tax Type and linked to related documents via a Cross-Reference API.</p>
+
+    <div class="graph-visual">
+      <div class="graph-center">
+        <div class="graph-hub">🏛️ Tax Type (GST · Customs · Central Excise · Service Tax)</div>
+        <div class="graph-connector"></div>
+        <div class="graph-branch-line"></div>
+        <div class="graph-row">
+          <div class="diagram-node node-legislative">📜 Acts → Chapters → Sections</div>
+          <div class="diagram-node node-legislative">📏 Rules → Chapters → Rules</div>
+        </div>
+        <div class="graph-row">
+          <div class="diagram-node node-regulatory">📋 Notifications</div>
+          <div class="diagram-node node-regulatory">📄 Circulars</div>
+          <div class="diagram-node node-regulatory">⚖️ Orders</div>
+          <div class="diagram-node node-regulatory">📝 Instructions</div>
+        </div>
+        <div class="graph-row">
+          <div class="diagram-node node-procedural">📑 Forms</div>
+        </div>
+        <div style="margin-top:16px; font-size: 13px; color: var(--text-muted); position: relative; z-index:1;">
+          All types interconnected via <strong style="color:var(--accent)">Cross-Reference API</strong> — Acts ↔ Rules ↔ Forms ↔ Notifications ↔ Circulars
+        </div>
+      </div>
+    </div>
+
+    <h3>Tax Type IDs</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Tax Type</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><code>1000001</code></td><td>GST (Goods and Services Tax)</td><td>✅ Fully indexed</td></tr>
+          <tr><td><code>1000002</code></td><td>Customs</td><td>📋 Metadata only</td></tr>
+          <tr><td><code>1000003</code></td><td>Central Excise</td><td>⬜ Not started</td></tr>
+          <tr><td><code>1000004</code></td><td>Service Tax</td><td>⬜ Not started</td></tr>
+          <tr><td><code>100005</code></td><td>HSNS Cess</td><td>⬜ Not started</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Content IDs -->
+  <section id="content-ids" class="fade-in">
+    <h2><span class="section-icon">🔑</span> Content ID System</h2>
+    <p>Every record has an <code>id</code> (primary key) and a <code>contentId</code> (cross-reference key). The contentId prefix identifies the document type:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Prefix</th><th>Type</th><th>Example</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>100</code></td><td>Tax Type</td><td><code>1001000001</code></td><td>GST</td></tr>
+          <tr><td><code>110</code></td><td>Act</td><td><code>1101000006</code></td><td>CGST Act</td></tr>
+          <tr><td><code>111</code></td><td>Act Chapter</td><td><code>1111000033</code></td><td>Chapter V</td></tr>
+          <tr><td><code>112</code></td><td>Act Section</td><td><code>1121000285</code></td><td>Section 16</td></tr>
+          <tr><td><code>120</code></td><td>Rule Set</td><td><code>1201000006</code></td><td>CGST Rules</td></tr>
+          <tr><td><code>121</code></td><td>Rule Chapter</td><td><code>1211000010</code></td><td>Rule Chapter</td></tr>
+          <tr><td><code>122</code></td><td>Rule Section</td><td><code>1221000083</code></td><td>Rule 3</td></tr>
+          <tr><td><code>150</code></td><td>Notification</td><td><code>1501010546</code></td><td>20/2025-CT</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Acts -->
+  <section id="acts" class="fade-in">
+    <h2><span class="section-icon">📜</span> Acts (Legislative Text)</h2>
+    <p>Acts follow a three-level hierarchy: <strong>Act → Chapters → Sections</strong>. Each section has raw HTML content.</p>
+
+    <h3>Act Metadata</h3>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-act-msts/<span class="param">{id}</span></span>
+    </div>
+
+    <pre><code><span class="comment">// Discovery: Scan IDs 1000001–1000030</span>
+{
+  <span class="key">"id"</span>: <span class="num">1000006</span>,
+  <span class="key">"contentId"</span>: <span class="num">1101000006</span>,
+  <span class="key">"actName"</span>: <span class="str">"Central Goods and Services Tax Act, 2017"</span>,
+  <span class="key">"isActive"</span>: <span class="str">"Y"</span>,
+  <span class="key">"taxId"</span>: { <span class="key">"id"</span>: <span class="num">1000001</span> },
+  <span class="key">"contentFilePath"</span>: <span class="str">"tax_repository\\gst\\acts\\...pdf"</span>,
+  <span class="key">"contentHtmlFilePath"</span>: <span class="str">"tax_repository\\gst\\acts\\...html"</span>
+}</code><span class="code-label">Response</span></pre>
+
+    <h3>GST Acts</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Act Name</th></tr></thead>
+        <tbody>
+          <tr><td><code>1000006</code></td><td>Central Goods and Services Tax Act, 2017</td></tr>
+          <tr><td><code>1000015</code></td><td>Integrated Goods And Services Tax Act, 2017</td></tr>
+          <tr><td><code>1000016</code></td><td>Union Territory Goods And Services Tax Act, 2017</td></tr>
+          <tr><td><code>1000013</code></td><td>GST (Compensation To States) Act, 2017</td></tr>
+          <tr><td><code>1000012</code></td><td>Constitution (101st Amendment) Act, 2016</td></tr>
+          <tr><td><code>1000019</code></td><td>CGST Amendment Act, 2023</td></tr>
+          <tr><td><code>1000020</code></td><td>CGST (Second Amendment) Act, 2023</td></tr>
+          <tr><td><code>1000021</code></td><td>IGST Amendment Act, 2023</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Chapters</h3>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-act-chapter-msts/getChapterName/<span class="param">{chapterId}</span></span>
+    </div>
+    <p>Discovery: Scan chapter IDs ~1000025–1000100, filter by <code>actId</code>.</p>
+
+    <div class="callout callout-note">
+      <span class="callout-icon">ℹ️</span>
+      <div><strong>CGST Act (ID 1000006)</strong> has <strong>22 chapters</strong> and <strong>187 sections</strong>, from Preliminary (Ch I) through Miscellaneous (Ch XXI) + Schedules.</div>
+    </div>
+
+    <h3>Sections</h3>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-act-section-msts/findByChapterId/<span class="param">{chapterId}</span></span>
+    </div>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-act-section-msts/viewSectionById/<span class="param">{sectionId}</span></span>
+    </div>
+
+    <pre><code>{
+  <span class="key">"id"</span>: <span class="num">1000285</span>,
+  <span class="key">"contentId"</span>: <span class="num">1121000285</span>,
+  <span class="key">"sectionNo"</span>: <span class="str">"Section 16"</span>,
+  <span class="key">"sectionName"</span>: <span class="str">"Eligibility and conditions for taking input tax credit"</span>,
+  <span class="key">"contentFilePath"</span>: <span class="str">"tax_repository\\gst\\acts\\...\\section16_v1.00.html"</span>,
+  <span class="key">"actId"</span>: { <span class="key">"id"</span>: <span class="num">1000006</span> },
+  <span class="key">"chapterId"</span>: { <span class="key">"id"</span>: <span class="num">1000033</span> }
+}</code><span class="code-label">Response</span></pre>
+
+    <h3>HTML Content</h3>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/content/html/<span class="param">{contentFilePath}</span></span>
+    </div>
+    <p>Returns <strong>raw HTML with inline CSS</strong> — the formatted legal text exactly as it appears on the website, with provisos, amendments, tables, and cross-references.</p>
+  </section>
+
+  <!-- Rules -->
+  <section id="rules" class="fade-in">
+    <h2><span class="section-icon">📏</span> Rules (Subordinate Legislation)</h2>
+    <p>Rules follow the same hierarchy as Acts but use <strong>bulk listing endpoints</strong> instead of ID scanning.</p>
+
+    <h3>List All Rule Sets</h3>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-rule-msts/fetchRules/<span class="param">{taxId}</span></span>
+    </div>
+
+    <pre><code>[{
+  <span class="key">"id"</span>: <span class="num">1000006</span>,
+  <span class="key">"ruleDocName"</span>: <span class="str">"Central Goods and Services Tax Rules, 2017"</span>,
+  <span class="key">"ruleCategory"</span>: <span class="str">"CGST Rules"</span>,
+  <span class="key">"cbicTaxMst"</span>: { <span class="key">"id"</span>: <span class="num">1000001</span> },
+  <span class="key">"contentFilePath"</span>: <span class="str">"...pdf"</span>,
+  <span class="key">"contentHtmlFilePath"</span>: <span class="str">"...html"</span>
+}]</code><span class="code-label">Response</span></pre>
+
+    <h3>GST Rule Sets (10 total)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Rule Set</th></tr></thead>
+        <tbody>
+          <tr><td><code>1000006</code></td><td>Central Goods and Services Tax Rules, 2017</td></tr>
+          <tr><td><code>1000028</code></td><td>Integrated Goods and Services Tax Rules, 2017</td></tr>
+          <tr><td><code>1000029</code></td><td>GST Compensation Cess Rules, 2017</td></tr>
+          <tr><td><code>1000030</code></td><td>GST Settlement of Funds Rules, 2017</td></tr>
+          <tr><td><code>1000031–35</code></td><td>UTGST Rules (Lakshadweep, Daman, Dadra, Chandigarh, A&N)</td></tr>
+          <tr><td><code>1000091</code></td><td>GST (Period of Levy and Collection of Cess) Rules, 2022</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Rule Chapters & Sections</h3>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-rule-chapter-msts/findChapterByRuleId/<span class="param">{ruleId}</span></span>
+    </div>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-rule-section-msts/findSectionByRuleId/<span class="param">{ruleId}</span></span>
+    </div>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-rule-section-msts/findByChapterId/<span class="param">{chapterId}</span></span>
+    </div>
+
+    <p>CGST Rules (ID 1000006): <strong>20 chapters</strong> (Ch I–XIX). HTML content fetched the same way as Act sections.</p>
+  </section>
+
+  <!-- Notifications -->
+  <section id="notifications" class="fade-in">
+    <h2><span class="section-icon">📋</span> Notifications · Circulars · Orders · Instructions</h2>
+    <p>These four document types share the <strong>same API pattern</strong>: individual metadata by ID + base64 PDF download.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Metadata Endpoint</th><th>Download Endpoint</th><th>ID Range</th></tr></thead>
+        <tbody>
+          <tr><td>Notifications</td><td><code>/api/cbic-notification-msts/{id}</code></td><td><code>.../download/{id}/{lang}</code></td><td>1M–10.6K</td></tr>
+          <tr><td>Circulars</td><td><code>/api/cbic-circular-msts/{id}</code></td><td><code>.../download/{id}/{lang}</code></td><td>1M–4K</td></tr>
+          <tr><td>Orders</td><td><code>/api/cbic-order-msts/{id}</code></td><td><code>.../download/{id}/{lang}</code></td><td>1M–5K</td></tr>
+          <tr><td>Instructions</td><td><code>/api/cbic-instruction-msts/{id}</code></td><td><code>.../download/{id}/{lang}</code></td><td>1M–5K</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>Language codes:</strong> <code>ENG</code>, <code>HINDI</code></p>
+
+    <pre><code><span class="comment">// Notification metadata (representative for all 4 types)</span>
+{
+  <span class="key">"id"</span>: <span class="num">1010546</span>,
+  <span class="key">"contentId"</span>: <span class="num">1501010546</span>,
+  <span class="key">"notificationNo"</span>: <span class="str">"20/2025-Central Tax"</span>,
+  <span class="key">"notificationName"</span>: <span class="str">"Seeks to notify CGST (Fifth Amendment) Rules, 2025"</span>,
+  <span class="key">"notificationCategory"</span>: <span class="str">"Central Tax"</span>,
+  <span class="key">"notificationDt"</span>: <span class="str">"2025-12-31T05:30:00+05:30"</span>,
+  <span class="key">"docFileName"</span>: <span class="str">"20-2025-ct.pdf"</span>,
+  <span class="key">"tax"</span>: { <span class="key">"id"</span>: <span class="num">1000001</span> }
+}</code><span class="code-label">Response</span></pre>
+
+    <pre><code><span class="comment">// PDF download response (base64-encoded)</span>
+{ <span class="key">"data"</span>: <span class="str">"JVBERi0xLjc..."</span> }</code><span class="code-label">Download</span></pre>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div>Hindi PDFs frequently return HTTP 500 — this is a server-side issue, not all Hindi versions exist in the CBIC database.</div>
+    </div>
+  </section>
+
+  <!-- Forms -->
+  <section id="forms" class="fade-in">
+    <h2><span class="section-icon">📑</span> Forms</h2>
+    <p>Forms use a <strong>bulk fetch pattern</strong> — a single call returns all forms for a tax type. No ID scanning needed.</p>
+
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-form-msts/fetchForms/<span class="param">{taxId}</span></span>
+    </div>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-form-msts/fetchFormsCategory/<span class="param">{taxId}</span></span>
+    </div>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-form-msts/download/<span class="param">{id}</span></span>
+    </div>
+
+    <p>Download response: <code>{"data": "base64...", "fileName": "FORM GST CMP-01.pdf"}</code></p>
+    <p><strong>GST Forms:</strong> 197 forms across 21 categories (Registration, Return, Refund, Assessment, Appeal, etc.)</p>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div>Some forms return empty <code>fileName</code>. Implement fallback naming (e.g., <code>form_{id}.pdf</code>).</div>
+    </div>
+  </section>
+
+  <!-- Cross-Reference -->
+  <section id="cross-ref" class="fade-in">
+    <h2><span class="section-icon">🔗</span> Cross-Reference API</h2>
+    <p>The most powerful feature — links <strong>every document type to every other</strong> via a unified graph.</p>
+
+    <h3>Get Related Content Counts</h3>
+    <div class="endpoint">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/cbic-content-maps/get-related-content/<span class="param">{docType}</span>/<span class="param">{contentId}</span></span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>docType</th><th>Used for</th><th>Example contentId</th></tr></thead>
+        <tbody>
+          <tr><td><code>Acts</code></td><td>Act sections</td><td><code>1121000285</code></td></tr>
+          <tr><td><code>Rules</code></td><td>Rule sections</td><td><code>1221000083</code></td></tr>
+          <tr><td><code>Notification</code></td><td>Notifications</td><td><code>1501010546</code></td></tr>
+          <tr><td><code>Circular</code></td><td>Circulars</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre><code><span class="comment">// Section 16 of CGST Act → 14 related Rules</span>
+[{ <span class="key">"relatedTabName"</span>: <span class="str">"Rule"</span>, <span class="key">"count"</span>: <span class="num">14</span>, <span class="key">"relatedContent"</span>: <span class="str">"RULE"</span> }]
+
+<span class="comment">// Rule 3 of CGST Rules → 1 Act + 6 Forms</span>
+[
+  { <span class="key">"relatedTabName"</span>: <span class="str">"Act"</span>, <span class="key">"count"</span>: <span class="num">1</span>, <span class="key">"relatedContent"</span>: <span class="str">"ACT"</span> },
+  { <span class="key">"relatedTabName"</span>: <span class="str">"Form"</span>, <span class="key">"count"</span>: <span class="num">6</span>, <span class="key">"relatedContent"</span>: <span class="str">"FORM"</span> }
+]</code><span class="code-label">Response</span></pre>
+
+    <h3>Get Related Content Details</h3>
+    <div class="endpoint">
+      <span class="method method-post">POST</span>
+      <span class="path">/api/cbic-content-maps/fetch-related-content</span>
+    </div>
+
+    <pre><code><span class="comment">// Request body</span>
+{
+  <span class="key">"parentContentCategory"</span>: <span class="str">"RULE"</span>,
+  <span class="key">"parentContentId"</span>: <span class="num">1121000285</span>
+}</code><span class="code-label">Request</span></pre>
+
+    <p><code>parentContentCategory</code> values: <code>"ACT"</code>, <code>"RULE"</code>, <code>"NOTIFICATION"</code>, <code>"CIRCULAR"</code>, <code>"FORM"</code></p>
+
+    <pre><code><span class="comment">// Response — returns linked documents across ALL categories</span>
+{
+  <span class="key">"actSectionMsts"</span>: <span class="null">null</span>,
+  <span class="key">"ruleSectionMsts"</span>: [
+    {
+      <span class="key">"taxType"</span>: <span class="str">"GST"</span>,
+      <span class="key">"ruleName"</span>: <span class="str">"Central Goods and Services Tax Rules, 2017"</span>,
+      <span class="key">"ruleSubjectName"</span>: <span class="str">"Rule 21 - Registration to be cancelled..."</span>,
+      <span class="key">"taxId"</span>: <span class="num">1000001</span>,
+      <span class="key">"ruleId"</span>: <span class="num">1000103</span>
+    }
+    <span class="comment">// ... 14 items for Section 16</span>
+  ],
+  <span class="key">"regulationMsts"</span>: <span class="null">null</span>,
+  <span class="key">"formMsts"</span>: <span class="null">null</span>,
+  <span class="key">"notificationMsts"</span>: <span class="null">null</span>,
+  <span class="key">"circularMsts"</span>: <span class="null">null</span>
+}</code><span class="code-label">Response</span></pre>
+
+    <h3>Cross-Reference Graph Example</h3>
+    <div class="card">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; line-height:2;">
+        <div><span style="color:var(--green)">Section 16</span> <span style="color:var(--text-muted)">(ITC eligibility)</span></div>
+        <div style="padding-left:20px; color:var(--text-muted)">├── <span style="color:var(--orange)">14 related Rules</span> (Rule 36, 37, 42, 43, etc.)</div>
+        <div style="padding-left:20px; color:var(--text-muted)">└── <span style="color:var(--cyan)">N related Notifications</span></div>
+        <div style="margin-top:12px"><span style="color:var(--green)">Rule 3</span> <span style="color:var(--text-muted)">(Composition Levy)</span></div>
+        <div style="padding-left:20px; color:var(--text-muted)">├── <span style="color:var(--orange)">1 related Act section</span></div>
+        <div style="padding-left:20px; color:var(--text-muted)">└── <span style="color:var(--accent)">6 related Forms</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Discovery Patterns -->
+  <section id="discovery" class="fade-in">
+    <h2><span class="section-icon">🔍</span> Discovery Patterns</h2>
+    <p>The CBIC API uses two different patterns depending on the data type:</p>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-get">Pattern A</span> Sequential ID Scanning</div>
+      <p style="margin-bottom:8px"><strong>Used by:</strong> Notifications, Circulars, Orders, Instructions, Act chapters</p>
+      <p>Scan IDs from <code>1000001</code> upward. Each ID returns a record (200) or 404. Filter by <code>tax.id</code> for specific tax types. IDs are <strong>not sequential</strong> by date or type — mixed across all taxes.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="badge badge-post">Pattern B</span> Bulk Fetch</div>
+      <p style="margin-bottom:8px"><strong>Used by:</strong> Forms, Rule sets, Rule sections, Rule chapters</p>
+      <p>A single API call returns all records for a tax type or parent entity:</p>
+      <div style="margin-top:8px; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--cyan); line-height:2;">
+        <div>fetchForms/{taxId} → all forms</div>
+        <div>fetchRules/{taxId} → all rule sets</div>
+        <div>findSectionByRuleId/{ruleId} → all rules in a set</div>
+        <div>findChapterByRuleId/{ruleId} → all chapters</div>
+        <div>findByChapterId/{chapterId} → all sections in a chapter</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Implementation -->
+  <section id="implementation" class="fade-in">
+    <h2><span class="section-icon">⚙️</span> Implementation Notes</h2>
+
+    <h3>SSL/TLS</h3>
+    <pre><code><span class="comment"># Python (aiohttp)</span>
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = <span class="bool">False</span>
+ssl_context.verify_mode = ssl.CERT_NONE
+
+<span class="comment"># Python (requests)</span>
+requests.get(url, verify=<span class="bool">False</span>)
+
+<span class="comment"># cURL</span>
+curl -k <span class="str">"https://taxinformation.cbic.gov.in/api/..."</span></code><span class="code-label">Python / cURL</span></pre>
+
+    <h3>Rate Limiting</h3>
+    <p>No documented limits. Recommended: 5–10 concurrent connections with 1-second batch delays. Full notification scan (~10K IDs) takes ~18–20 minutes.</p>
+
+    <h3>Known Issues</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Issue</th><th>Impact</th><th>Workaround</th></tr></thead>
+        <tbody>
+          <tr><td>Hindi PDFs return 500</td><td>~195 missing Hindi circulars</td><td>Log and skip</td></tr>
+          <tr><td>Empty <code>fileName</code> on Forms</td><td>8 forms affected</td><td>Fallback: <code>form_{id}.pdf</code></td></tr>
+          <tr><td>Orphan form ID 1000379</td><td>1 form always 500</td><td>Skip (broken DB record)</td></tr>
+          <tr><td><code>findByActId</code> not valid</td><td>Returns Angular HTML</td><td>Use <code>getChapterName</code> scan</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Statistics -->
+  <section id="statistics" class="fade-in">
+    <h2><span class="section-icon">📊</span> Data Collection Statistics</h2>
+    <p>Total documents indexed as of March 2026:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Data Type</th><th>Count</th><th>Method</th><th>Content</th></tr></thead>
+        <tbody>
+          <tr><td>GST Notifications</td><td><strong>1,281</strong></td><td>ID scan</td><td>PDF</td></tr>
+          <tr><td>GST Circulars</td><td><strong>271</strong></td><td>ID scan</td><td>PDF</td></tr>
+          <tr><td>GST Orders</td><td><strong>39</strong></td><td>ID scan</td><td>PDF</td></tr>
+          <tr><td>GST Instructions</td><td><strong>42</strong></td><td>ID scan</td><td>PDF</td></tr>
+          <tr><td>GST Forms</td><td><strong>197</strong></td><td>Bulk API</td><td>PDF</td></tr>
+          <tr><td>GST Acts</td><td><strong>10 acts · 187+ secs</strong></td><td>ID scan + hierarchy</td><td>HTML</td></tr>
+          <tr><td>GST Rules</td><td><strong>10 sets · 160+ rules</strong></td><td>Bulk API</td><td>HTML</td></tr>
+          <tr><td>Customs Notifications</td><td><strong>6,872</strong></td><td>ID scan</td><td>PDF</td></tr>
+          <tr><td>Customs Circulars</td><td><strong>1,760</strong></td><td>ID scan</td><td>PDF</td></tr>
+          <tr><td>Customs Instructions</td><td><strong>393</strong></td><td>ID scan</td><td>PDF</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="text-align:center; padding:32px;">
+      <div style="font-size:48px; font-weight:800; color: var(--accent);">11,855+</div>
+      <div style="color:var(--text-muted); font-size:14px; margin-top:4px;">Total Documents Indexed</div>
+    </div>
+  </section>
+
+  <footer style="text-align:center; padding:32px 0; color:var(--text-muted); font-size:12px; border-top:1px solid var(--border); margin-top:48px;">
+    Based on reverse engineering of public endpoints · CBIC may change APIs without notice · Last updated March 14, 2026
+  </footer>
+
+</main>
+
+<script>
+// ─── Scroll-based active sidebar link ───
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.sidebar a');
+
+function updateActive() {
+  const scrollY = window.scrollY + 120;
+  let current = '';
+  sections.forEach(sec => {
+    if (sec.offsetTop <= scrollY) current = sec.id;
+  });
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+}
+window.addEventListener('scroll', updateActive, { passive: true });
+updateActive();
+
+// ─── Close sidebar on mobile nav ───
+navLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.remove('open');
+  });
+});
+
+// ─── Intersection Observer for fade-in ───
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ─── Smooth hover glow on endpoints ───
+document.querySelectorAll('.endpoint').forEach(el => {
+  el.addEventListener('click', () => {
+    const path = el.querySelector('.path').textContent;
+    navigator.clipboard?.writeText('https://taxinformation.cbic.gov.in' + path.replace(/\{.*?\}/g, ''));
+    el.style.borderColor = 'var(--green)';
+    setTimeout(() => el.style.borderColor = '', 800);
+  });
+});
+</script>
+
+</body>
+</html>

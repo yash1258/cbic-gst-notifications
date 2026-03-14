@@ -1,324 +1,437 @@
-# CBIC Tax Information Portal API Documentation
+# CBIC Tax Information Portal — API Documentation
 
 **Base URL:** `https://taxinformation.cbic.gov.in`  
 **Authentication:** None required (public endpoints)  
-**SSL Certificate:** Self-signed (disable verification)  
+**SSL:** Self-signed certificate (disable verification)  
 **Last Updated:** March 14, 2026  
 
 ---
 
-## Overview
+## Data Model Overview
 
-This document describes the public REST API endpoints discovered for the CBIC (Central Board of Indirect Taxes and Customs) Tax Information Portal. These endpoints provide access to GST, Customs, and Central Excise notifications, circulars, orders, instructions, and forms.
+The CBIC portal organizes Indian tax law into a **hierarchical graph** of interconnected document types. Every document is scoped under a **Tax Type** and linked to related documents via a **Cross-Reference API**.
 
-**Tax Type IDs:**
-- `1000001` - GST (Goods and Services Tax)
-- `1000002` - Customs
-- `1000003` - Central Excise
-- `100005` - HSNS Cess
+```mermaid
+graph TD
+    TAX["🏛️ Tax Type<br/>(GST, Customs, Central Excise)"]
+    
+    TAX --> ACTS["📜 Acts<br/>(legislation)"]
+    TAX --> RULES["📏 Rules<br/>(subordinate legislation)"]
+    TAX --> NOTIF["📋 Notifications"]
+    TAX --> CIRC["📄 Circulars"]
+    TAX --> ORD["⚖️ Orders"]
+    TAX --> INST["📝 Instructions"]
+    TAX --> FORMS["📑 Forms"]
 
----
+    ACTS --> CHAP_A["Chapters"]
+    CHAP_A --> SEC_A["Sections<br/>(HTML content)"]
 
-## Endpoints
+    RULES --> CHAP_R["Chapters"]
+    CHAP_R --> SEC_R["Rules/Sections<br/>(HTML content)"]
 
-### 1. Get Tax Types
+    SEC_A <-.->|"Cross-Ref API"| SEC_R
+    SEC_A <-.->|"Cross-Ref API"| NOTIF
+    SEC_A <-.->|"Cross-Ref API"| CIRC
+    SEC_R <-.->|"Cross-Ref API"| FORMS
+    SEC_R <-.->|"Cross-Ref API"| NOTIF
 
-Lists all available tax types in the system.
-
-**Endpoint:** `GET /api/cbic-tax-msts`
-
-**Response:**
-```json
-[
-  {
-    "id": 1000001,
-    "contentId": 1001000001,
-    "taxName": "GST",
-    "taxNameHi": "जीएसटी",
-    "isActive": "Y",
-    "createdBy": 1038563,
-    "createdDt": "2021-07-21T05:30:00+05:30"
-  }
-]
+    style TAX fill:#4A90D9,color:white
+    style ACTS fill:#2ECC71,color:white
+    style RULES fill:#2ECC71,color:white
+    style NOTIF fill:#E67E22,color:white
+    style CIRC fill:#E67E22,color:white
+    style ORD fill:#E67E22,color:white
+    style INST fill:#E67E22,color:white
+    style FORMS fill:#9B59B6,color:white
 ```
 
+### Content ID Prefixes
+
+Every record has an `id` (primary key) and a `contentId` (used for cross-references). The contentId prefix identifies the document type:
+
+| Prefix | Type | Example |
+|---|---|---|
+| `100` | Tax Type | `1001000001` (GST) |
+| `110` | Act | `1101000006` (CGST Act) |
+| `111` | Act Chapter | `1111000033` (Chapter V) |
+| `112` | Act Section | `1121000285` (Section 16) |
+| `120` | Rule Set | `1201000006` (CGST Rules) |
+| `121` | Rule Chapter | `1211000010` |
+| `122` | Rule Section | `1221000083` (Rule 3) |
+| `150` | Notification | `1501010546` |
+| `160` | Circular | — |
+
 ---
 
-### 2. Get Notification Metadata
+## 1. Tax Types
 
-Retrieves complete metadata for a specific notification by ID.
+**Endpoint:** `GET /api/cbic-tax-msts`  
+**Per tax:** `GET /api/cbic-tax-msts/{taxId}`
 
-**Endpoint:** `GET /api/cbic-notification-msts/{id}`
+| ID | Tax Type |
+|---|---|
+| `1000001` | GST |
+| `1000002` | Customs |
+| `1000003` | Central Excise |
+| `1000004` | Service Tax |
+| `100005` | HSNS Cess |
 
-**Related Endpoint (Circulars):** `GET /api/cbic-circular-msts/{id}`
-Returns similar structure for Circulars instead of Notifications.
+---
 
-**Parameters:**
-- `id` (path, integer): Database ID of the notification (range: 1000001-1010588) or circular (range: 1000001-1004000)
+## 2. Acts (Legislative Text)
 
-**Response (200 OK):**
+Acts are structured as **Act → Chapters → Sections**, where each section has HTML content.
+
+### 2.1 Act Metadata
+
+**Endpoint:** `GET /api/cbic-act-msts/{id}`
+
+```json
+{
+  "id": 1000006,
+  "contentId": 1101000006,
+  "actName": "Central Goods and Services Tax Act, 2017",
+  "isActive": "Y",
+  "taxId": {"id": 1000001},
+  "contentFilePath": "tax_repository\\gst\\acts\\...pdf",
+  "contentHtmlFilePath": "tax_repository\\gst\\acts\\...html"
+}
+```
+
+**Discovery method:** Scan IDs 1000001–1000030. No bulk listing endpoint exists.
+
+**GST Acts found (tax.id = 1000001):**
+
+| ID | Act Name |
+|---|---|
+| 1000006 | Central Goods and Services Tax Act, 2017 |
+| 1000015 | Integrated Goods And Services Tax Act, 2017 |
+| 1000016 | Union Territory Goods And Services Tax Act, 2017 |
+| 1000013 | Goods And Services Tax (Compensation To States) Act, 2017 |
+| 1000012 | Constitution (One Hundred And First Amendment) Act, 2016 |
+| 1000011 | CGST (Extension To Jammu And Kashmir) Act, 2017 |
+| 1000014 | IGST (Extension To Jammu And Kashmir) Act, 2017 |
+| 1000019 | CGST Amendment Act, 2023 |
+| 1000020 | CGST (Second Amendment) Act, 2023 |
+| 1000021 | IGST Amendment Act, 2023 |
+
+### 2.2 Chapters
+
+**Per chapter:** `GET /api/cbic-act-chapter-msts/getChapterName/{chapterId}`
+
+```json
+[{
+  "id": 1000033,
+  "contentId": 1111000033,
+  "chapterNo": "Chapter V",
+  "chapterName": "Input Tax Credit",
+  "orderId": 5,
+  "actId": {"id": 1000006},
+  "taxId": {"id": 1000001}
+}]
+```
+
+**Discovery method:** Scan chapter IDs (range ~1000025–1000100), filter by `actId`.
+
+**CGST Act (ID 1000006): 22 chapters, 187 sections**
+
+| Chapter | Name | Sections |
+|---|---|---|
+| I | Preliminary | 2 |
+| II | Administration | 4 |
+| III | Levy and Collection of Tax | 0 |
+| IV | Time and Value of Supply | 4 |
+| V | Input Tax Credit | 6 |
+| VI | Registration | 9 |
+| VII | Tax Invoice, Debit and Credit Notes | 5 |
+| VIII | Accounts and Records | 2 |
+| IX | Returns | 13 |
+| X | Payment of Tax | 8 |
+| XI | Refunds | 5 |
+| XII | Assessment | 6 |
+| XIII | Audit | 2 |
+| XIV | Inspection, Search, Seizure and Arrest | 6 |
+| XV | Demands and Recovery | 13 |
+| XVI | Liability to pay in Certain Cases | 10 |
+| XVII | Advance Ruling | 15 |
+| XVIII | Appeals and Revision | 15 |
+| XIX | Offences and Penalties | 20 |
+| XX | Transitional Provisions | 4 |
+| XXI | Miscellaneous | 35 |
+| Schedule | — | 3 |
+
+### 2.3 Sections
+
+**By chapter:** `GET /api/cbic-act-section-msts/findByChapterId/{chapterId}`  
+**By ID:** `GET /api/cbic-act-section-msts/viewSectionById/{sectionId}`
+
+```json
+[{
+  "id": 1000285,
+  "contentId": 1121000285,
+  "sectionNo": "Section 16",
+  "sectionName": "Eligibility and conditions for taking input tax credit",
+  "contentFilePath": "tax_repository\\gst\\acts\\2017_CGST_act\\active\\chapter5\\section16_v1.00.html",
+  "actId": {"id": 1000006},
+  "chapterId": {"id": 1000033}
+}]
+```
+
+### 2.4 Section HTML Content
+
+**Endpoint:** `GET /content/html/{contentFilePath}`
+
+Returns raw HTML with inline CSS. This is the **formatted legal text** exactly as it appears on the website — with provisos, explanations, amendments, tables, and cross-references.
+
+---
+
+## 3. Rules (Subordinate Legislation)
+
+Rules follow the same hierarchical pattern as Acts, but use **bulk listing endpoints** instead of ID scanning.
+
+### 3.1 List All Rule Sets
+
+**Endpoint:** `GET /api/cbic-rule-msts/fetchRules/{taxId}`  
+**Per rule:** `GET /api/cbic-rule-msts/{id}`
+
+```json
+[{
+  "id": 1000006,
+  "ruleDocName": "Central Goods and Services Tax Rules, 2017",
+  "ruleCategory": "CGST Rules",
+  "cbicTaxMst": {"id": 1000001},
+  "contentFilePath": "...pdf",
+  "contentHtmlFilePath": "...html"
+}]
+```
+
+**GST Rule Sets (taxId=1000001): 10 total**
+
+| ID | Rule Set |
+|---|---|
+| 1000006 | Central Goods and Services Tax Rules, 2017 |
+| 1000028 | Integrated Goods and Services Tax Rules, 2017 |
+| 1000029 | GST Compensation Cess Rules, 2017 |
+| 1000030 | GST Settlement of Funds Rules, 2017 |
+| 1000031 | UTGST (Lakshadweep) Rules, 2017 |
+| 1000032 | UTGST (Daman and Diu) Rules, 2017 |
+| 1000033 | UTGST (Dadra and Nagar Haveli) Rules, 2017 |
+| 1000034 | UTGST (Chandigarh) Rules, 2017 |
+| 1000035 | UTGST (Andaman and Nicobar Islands) Rules, 2017 |
+| 1000091 | GST (Period of Levy and Collection of Cess) Rules, 2022 |
+
+### 3.2 Rule Chapters
+
+**Endpoint:** `GET /api/cbic-rule-chapter-msts/findChapterByRuleId/{ruleId}`
+
+```json
+[{
+  "id": 1000011,
+  "chapterNo": "Chapter I",
+  "chapterName": "Preliminary",
+  "cbicRuleMst": {"id": 1000006},
+  "cbicTaxMst": {"id": 1000001}
+}]
+```
+
+**CGST Rules (ID 1000006): 20 chapters** (Ch I–XIX + header)
+
+### 3.3 Rule Sections
+
+**By rule set (bulk):** `GET /api/cbic-rule-section-msts/findSectionByRuleId/{ruleId}`  
+**By chapter:** `GET /api/cbic-rule-section-msts/findByChapterId/{chapterId}`
+
+```json
+[{
+  "id": 1000083,
+  "sectionNo": "Rule 3",
+  "sectionName": "Composition Levy",
+  "contentFilePath": "tax_repository/gst/rules/cgst_rules/active/chapter2/rule3_v1.00.html",
+  "cbicRuleChapterMst": {"id": 1000012}
+}]
+```
+
+HTML content is fetched the same way as Act sections: `GET /content/html/{contentFilePath}`
+
+---
+
+## 4. Notifications, Circulars, Orders, Instructions
+
+These four document types share the **same API pattern**: individual metadata by ID + PDF download.
+
+### Common Pattern
+
+| Type | Metadata | Download | ID Range |
+|---|---|---|---|
+| Notifications | `GET /api/cbic-notification-msts/{id}` | `.../download/{id}/{lang}` | 1M–10.6K |
+| Circulars | `GET /api/cbic-circular-msts/{id}` | `.../download/{id}/{lang}` | 1M–4K |
+| Orders | `GET /api/cbic-order-msts/{id}` | `.../download/{id}/{lang}` | 1M–5K |
+| Instructions | `GET /api/cbic-instruction-msts/{id}` | `.../download/{id}/{lang}` | 1M–5K |
+
+**Language codes:** `ENG`, `HINDI`
+
+**Discovery method:** Sequential ID scan. Each ID returns either the record (200) or 404. Records contain a `tax.id` field used to filter by tax type.
+
+### Notification Metadata (representative for all 4 types)
+
 ```json
 {
   "id": 1010546,
   "contentId": 1501010546,
-  "contentLanguage": "ENGLISH",
-  "isActive": "Y",
-  "createdDt": "2026-01-01T05:30:00+05:30",
-  "updatedDt": null,
-  "isAmended": "",
-  "isOmitted": "",
-  "parentId": null,
-  "orderId": 202512311020,
-  "versionNo": null,
   "notificationNo": "20/2025-Central Tax",
-  "notificationName": "Seeks to notify Central Goods and Services Tax (Fifth Amendment) Rules, 2025",
+  "notificationName": "Seeks to notify CGST (Fifth Amendment) Rules, 2025",
   "notificationCategory": "Central Tax",
   "notificationDt": "2025-12-31T05:30:00+05:30",
-  "issueDt": null,
-  "amendDt": null,
-  "docFilePath": "tax_repository\\gst\\notifications\\20-2025-ct.pdf",
   "docFileName": "20-2025-ct.pdf",
-  "docFilePathHi": "tax_repository\\gst\\notifications\\20-2025h-ct.pdf",
   "docFileNameHi": "20-2025h-ct.pdf",
-  "docFilePathAOD": "",
-  "docFileNameAOD": "",
-  "tax": {
-    "id": 1000001,
-    "contentId": null,
-    "taxName": null,
-    "taxNameHi": null,
-    "isActive": null,
-    "createdBy": null,
-    "createdDt": null,
-    "updatedBy": null,
-    "updatedDt": null
-  },
-  "isAttachment": null,
-  "ntRemarks": null,
-  "isHistory": null,
-  "notificationNoHi": "",
-  "notificationNameHi": "",
-  "notificationCategoryHi": null,
-  "notificationDtHi": null,
-  "language": null
+  "tax": {"id": 1000001},
+  "isAmended": "",
+  "parentId": null
 }
 ```
 
-**Response Codes:**
-- `200` - Success, notification found
-- `404` - Notification ID does not exist
+### PDF Download
 
-**Field Descriptions:**
-
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `id` | integer | Database primary key | 1010546 |
-| `notificationNo` | string | Official notification number | "20/2025-Central Tax" |
-| `notificationName` | string | Subject/title of notification | "Seeks to notify Central Goods..." |
-| `notificationCategory` | string | Category classification | "Central Tax" |
-| `notificationDt` | string (ISO 8601) | Issue date | "2025-12-31T05:30:00+05:30" |
-| `docFileName` | string | English PDF filename | "20-2025-ct.pdf" |
-| `docFileNameHi` | string | Hindi PDF filename | "20-2025h-ct.pdf" |
-| `isAmended` | string | Amendment flag ("Y" or "") | "" |
-| `isOmitted` | string | Omission flag ("Y" or "") | "" |
-| `parentId` | integer/null | Reference to parent if amended | null |
-| `tax.id` | integer | Tax type ID | 1000001 (GST) |
-
-**Categories Identified:**
-- Central Tax
-- Central Tax (Rate)
-- Integrated Tax
-- Integrated Tax (Rate)
-- Union Territory Tax
-- Union Territory Tax (Rate)
-- Compensation Cess
-- Compensation Cess (Rate)
-
----
-
-### 3. Download PDF (English)
-
-Downloads the PDF document (base64-encoded).
-
-**Endpoint:** `GET /api/cbic-notification-msts/download/{id}/{language}`
-
-**Related Circulars Endpoint:** `GET /api/cbic-circular-msts/download/{id}/{language}`
-
-**Parameters:**
-- `id` (path, integer): Database ID of the notification
-- `language` (path, string): Language code
-  - `ENG` - English
-  - `HIN` - Hindi (may return 500 for some notifications)
-
-**Response (200 OK):**
 ```json
-{
-  "data": "JVBERi0xLjcKCjQgMCBvYmoKKElkZW50aXR5KQplbmRvYmo..."
-}
+{"data": "JVBERi0xLjc..."}  // base64-encoded PDF
 ```
 
-The `data` field contains **base64-encoded PDF binary**.
+Decode with `base64.b64decode(response["data"])`.
 
-**Decoding Example:**
-```python
-import base64
-import json
-
-response = '{"data": "JVBERi0xLjc..."}'
-data = json.loads(response)
-pdf_bytes = base64.b64decode(data["data"])
-
-with open("notification.pdf", "wb") as f:
-    f.write(pdf_bytes)
-```
-
-**Response Codes:**
-- `200` - Success, PDF available
-- `500` - Server error (common for Hindi PDFs or missing files)
-- `404` - Notification not found
-
-**Notes:**
-- PDFs are typically 50KB-500KB in size
-- The base64 string can be very long (hundreds of KB)
+> [!NOTE]
+> Hindi PDFs frequently return HTTP 500 (server-side issue, not all Hindi versions exist).
 
 ---
 
-### 4. Download Hindi PDF
+## 5. Forms
 
-Downloads the Hindi version of the PDF document.
+Forms use a **bulk fetch pattern** — no ID scanning needed.
 
-**Endpoint:** `GET /api/cbic-notification-msts/download/{id}/HINDI`
-
-**Parameters:**
-- `id` (path, integer): Database ID of the notification
-- `language` (path, string): `HINDI` (not `HIN`)
-
-**Response (200 OK):**
-```json
-{
-  "data": "JVBERi0xLjcKCjQgMCBvYmoKKElkZW50aXR5KQplbmRvYmo..."
-}
-```
-
-Same base64-encoded format as English endpoint.
-
-**Response Codes:**
-- `200` - Success, Hindi PDF available
-- `500` - Server error (PDF may not exist for this notification)
-- `404` - Notification not found
-
-**Key Differences from English:**
-- Language code is `HINDI` (not `HIN` or `HI`)
-- **All 2025 notifications have Hindi versions** (93/93 successful)
-- Some notifications are **Hindi-only** (no English version exists)
-  - These are typically corrigenda (corrections to Hindi text)
-  - Example IDs: 1010304, 1010305, 1010306, 1010308, 1010309, 1010310, 1010472
-
-**Usage Pattern:**
-```python
-# Download both languages for a notification
-english_url = f"/api/cbic-notification-msts/download/{id}/ENG"
-hindi_url = f"/api/cbic-notification-msts/download/{id}/HINDI"
-
-# Try English first
-response = requests.get(english_url)
-if response.status_code == 500:
-    # Fall back to Hindi
-    response = requests.get(hindi_url)
-```
-
----
-
-### 5. Orders API
-
-**Metadata Endpoint:** `GET /api/cbic-order-msts/{id}`  
-**Download Endpoint:** `GET /api/cbic-order-msts/download/{id}/{language}`
-
-Same structure as Notifications. Orders use `orderNo`, `orderDt`, `orderName`, `orderCategory`.
-
-**ID Range:** 1000001–1005000 (GST: 39 orders, 2017–2022)  
-**Categories:** Order-CGST, Order-UTSGT, Removal of Difficulty - CGST, Removal of Difficulty - UTGST
-
----
-
-### 6. Instructions API
-
-**Metadata Endpoint:** `GET /api/cbic-instruction-msts/{id}`  
-**Download Endpoint:** `GET /api/cbic-instruction-msts/download/{id}/{language}`
-
-Same structure as above. Instructions use `instructionNo`, `instructionDt`, `instructionName`, `instructionCategory`, `insYear`.
-
-**ID Range:** 1000001–1005000  
-- GST (tax.id=1000001): 42 instructions (2019–2025)  
-- Customs (tax.id=1000002): 393 instructions (2004–2026)
-
----
-
-### 7. Forms API (Bulk Fetch)
-
-Forms use a **different pattern** — a single call returns all forms for a tax type.
-
-**List Categories:** `GET /api/cbic-form-msts/fetchFormsCategory/{taxId}`  
-**Fetch All Forms:** `GET /api/cbic-form-msts/fetchForms/{taxId}`  
-**Filter by Category:** `GET /api/cbic-form-msts/findFormByFormCategory/{taxId}/{categoryName}`  
+**List all forms:** `GET /api/cbic-form-msts/fetchForms/{taxId}`  
+**List categories:** `GET /api/cbic-form-msts/fetchFormsCategory/{taxId}`  
+**Filter by category:** `GET /api/cbic-form-msts/findFormByFormCategory/{taxId}/{category}`  
 **Download PDF:** `GET /api/cbic-form-msts/download/{id}`
 
-**Key Differences from other endpoints:**
-- No sequential ID scanning needed — bulk fetch returns all records
-- No language parameter on download — forms are English-only
-- Organized by `formCategory` instead of date
-- Download response: `{"data": "base64...", "fileName": "FORM GST CMP-01.pdf"}`
-- Some forms return empty `fileName` (especially GST Amnesty Scheme 2024)
+Download response includes the filename: `{"data": "base64...", "fileName": "FORM GST CMP-01.pdf"}`
 
-**GST Forms (taxId=1000001):** 197 forms, 21 categories, IDs 1000019–1000405
+> [!WARNING]
+> Some forms return empty `fileName`. Implement fallback naming (e.g., `form_{id}.pdf`).
 
-| Category | Count |
+**GST Forms:** 197 forms across 21 categories.
+
+---
+
+## 6. Cross-Reference API ⭐
+
+The most powerful feature — links **every document type to every other** via a unified graph.
+
+### 6.1 Get Related Content Counts
+
+**Endpoint:** `GET /api/cbic-content-maps/get-related-content/{docType}/{contentId}`
+
+| docType | Used for |
 |---|---|
-| Registration | 33 |
-| Demand and Recovery Forms | 31 |
-| Return | 22 |
-| Assessment | 18 |
-| Refund | 16 |
-| Appeal | 12 |
-| Other (15 categories) | 65 |
+| `Acts` | Act sections |
+| `Rules` | Rule sections |
+| `Notification` | Notifications |
+| `Circular` | Circulars |
 
-## ID Range Information
+```json
+// GET /api/cbic-content-maps/get-related-content/Acts/1121000285
+// (Section 16 of CGST Act)
+[{"relatedTabName": "Rule", "count": 14, "relatedContent": "RULE"}]
+```
 
-### Valid Notification IDs
-- **Minimum:** 1000001
-- **Maximum:** 1010588 (as of March 2026)
-- **Total IDs:** ~10,588
+```json
+// GET /api/cbic-content-maps/get-related-content/Rules/1221000083
+// (Rule 3 of CGST Rules)
+[
+  {"relatedTabName": "Act", "count": 1, "relatedContent": "ACT"},
+  {"relatedTabName": "Form", "count": 6, "relatedContent": "FORM"}
+]
+```
 
-### ID Distribution by Tax Type
+### 6.2 Get Related Content Details
 
-**GST (tax.id = 1000001, 2017+):**
-- 2017: 284 notifications
-- 2018: 196 notifications
-- 2019: 190 notifications
-- 2020: 127 notifications
-- 2021: 116 notifications
-- 2022: 78 notifications
-- 2023: 131 notifications
-- 2024: 66 notifications
-- 2025: 93 notifications
-- **Total:** 1,281 GST notifications (2017-2025)
+**Endpoint:** `POST /api/cbic-content-maps/fetch-related-content`
 
-**Note:** IDs are NOT sequential by date or tax type. IDs contain mixed records from all tax types across the entire range.
+```json
+// Request body
+{
+  "parentContentCategory": "RULE",
+  "parentContentId": 1121000285
+}
+```
+
+**`parentContentCategory` values:** `"ACT"`, `"RULE"`, `"NOTIFICATION"`, `"CIRCULAR"`, `"FORM"`
+
+**Response:**
+```json
+{
+  "actSectionMsts": null,
+  "ruleSectionMsts": [
+    {
+      "taxType": "GST",
+      "ruleName": "Central Goods and Services Tax Rules, 2017",
+      "ruleSubjectName": "Rule 21 - Registration to be cancelled in certain cases",
+      "taxId": 1000001,
+      "ruleId": 1000103
+    }
+    // ... 14 items for Section 16
+  ],
+  "regulationMsts": null,
+  "formMsts": null,
+  "notificationMsts": null,
+  "circularMsts": null
+}
+```
+
+### 6.3 Cross-Reference Graph
+
+This creates a bidirectional link graph across the entire tax database:
+
+```
+Section 16 (ITC eligibility)
+  ├── 14 related Rules (Rule 36, 37, 42, 43, etc.)
+  └── N related Notifications
+
+Rule 3 (Composition Levy)
+  ├── 1 related Act section
+  └── 6 related Forms
+```
+
+**Usage:** For any `contentId`, you can discover all related documents across every type — enabling compliance mapping, impact analysis, and legal research.
+
+---
+
+## 7. Discovery Patterns
+
+The CBIC API uses two different patterns depending on the data type:
+
+### Pattern A: Sequential ID Scanning
+
+**Used by:** Notifications, Circulars, Orders, Instructions, Act chapters
+
+Scan IDs from `1000001` upward. Each ID returns a record (200) or 404.
+- Filter by `tax.id` for specific tax types
+- IDs are **not sequential** by date or type — mixed across all taxes
+
+### Pattern B: Bulk Fetch
+
+**Used by:** Forms, Rule sets, Rule sections, Rule chapters
+
+A single API call returns all records for a tax type or parent entity.
+- `fetchForms/{taxId}` — all forms
+- `fetchRules/{taxId}` — all rule sets
+- `findSectionByRuleId/{ruleId}` — all rules in a set
+- `findChapterByRuleId/{ruleId}` — all chapters in a set
+- `findByChapterId/{chapterId}` — all sections in a chapter
 
 ---
 
 ## Implementation Notes
 
-### Rate Limiting
-- No documented rate limits
-- Recommended: 5-10 concurrent connections max
-- Suggested delay: 1 second per 100 requests
-- Total scan time: ~18-20 minutes for full range
-
 ### SSL/TLS
-The CBIC server uses a self-signed certificate. Disable SSL verification in your HTTP client:
-
-**Python (aiohttp/requests):**
 ```python
 # aiohttp
 ssl_context = ssl.create_default_context()
@@ -329,143 +442,59 @@ ssl_context.verify_mode = ssl.CERT_NONE
 requests.get(url, verify=False)
 ```
 
-**cURL:**
-```bash
-curl -k "https://taxinformation.cbic.gov.in/api/cbic-notification-msts/1010546"
-```
+### Rate Limiting
+- No documented limits
+- Recommended: 5–10 concurrent connections, 1s batch delays
+- Full notification scan (~10K IDs): ~18–20 minutes
 
-### Error Handling
-- Implement exponential backoff for 429/503 errors
-- Retry failed requests up to 3 times
-- Log 404s silently (ID doesn't exist)
-- Handle 500 errors gracefully (server issues)
-
-### Resume Capability
-Since IDs span a wide range without date ordering:
-- Save progress after every 1000 IDs
-- Store last successfully scanned ID
-- Filter results client-side for specific tax types/date ranges
+### Known Issues
+- Hindi PDFs frequently return HTTP 500
+- Some forms return empty `fileName` on download
+- 1 orphan form record (ID 1000379) returns 500
+- `findByActId` is **not** a valid endpoint (returns Angular app HTML)
+- Some Act/Rule chapter IDs are non-sequential
 
 ---
 
 ## Data Collection Statistics
 
-**Scan Date:** March 14, 2026  
-**Total Documents Indexed:** 11,855
+**Total Documents Indexed:** 11,855+
 
-| Data Type | Count | Method |
-|---|---|---|
-| GST Notifications | 1,281 | ID scan 1M–10.6K |
-| GST Circulars | 271 | ID scan 1M–4K |
-| GST Orders | 39 | ID scan 1M–5K |
-| GST Instructions | 42 | ID scan 1M–5K |
-| GST Forms | 197 | Bulk API |
-| Customs Notifications | 6,872 | ID scan 1M–10.6K |
-| Customs Circulars | 1,760 | ID scan 1M–4K |
-| Customs Instructions | 393 | ID scan 1M–5K |
-
-**Collection Method:**
-- Async concurrent scanning (5 connections)
-- 1-second batch delays
-- Exponential backoff retry logic
-- 30-second request timeout
-
----
-
-## Limitations
-
-1. **No Search API** - Cannot query by date, category, or tax type
-2. **No Pagination** - Must scan entire ID range
-3. **Hindi PDFs** - Many return 500 errors (server-side issue)
-4. **No Amendment Chains** - Parent-child relationships exist but require manual traversal
-5. **Static IDs** - New notifications get sequential IDs, but no push notification system
-
----
-
-## Use Cases
-
-### 1. Metadata Extraction
-Scrape all notification metadata for:
-- Compliance tracking
-- Historical analysis
-- Amendment tracking
-- Cross-referencing
-
-### 2. Document Archive
-Download PDFs for:
-- Legal documentation
-- Offline access
-- Text extraction and embedding
-- RAG (Retrieval-Augmented Generation) systems
-
-### 3. Monitoring
-Periodic scans (weekly/monthly) to:
-- Detect new notifications
-- Track amendments
-- Build notification feeds
-
----
-
-## Sample Implementation
-
-```python
-import aiohttp
-import asyncio
-import ssl
-
-BASE_URL = "https://taxinformation.cbic.gov.in"
-
-async def fetch_notification(session, notification_id):
-    url = f"{BASE_URL}/api/cbic-notification-msts/{notification_id}"
-    async with session.get(url, ssl=False) as response:
-        if response.status == 200:
-            return await response.json()
-        return None
-
-# Usage
-ssl_context = ssl.create_default_context()
-ssl_context.check_hostname = False
-ssl_context.verify_mode = ssl.CERT_NONE
-
-async with aiohttp.ClientSession() as session:
-    data = await fetch_notification(session, 1010546)
-    print(data["notificationNo"])  # "20/2025-Central Tax"
-```
-
----
-
-## Related Endpoints (Require Authentication)
-
-These endpoints return 401 Unauthorized and require authentication:
-- `GET /api/notifications`
-- `GET /api/content-types`
-- `GET /api/_search/*`
-
-They appear to be administrative/internal endpoints not intended for public access.
+| Data Type | Count | Method | Content |
+|---|---|---|---|
+| GST Notifications | 1,281 | ID scan | PDF |
+| GST Circulars | 271 | ID scan | PDF |
+| GST Orders | 39 | ID scan | PDF |
+| GST Instructions | 42 | ID scan | PDF |
+| GST Forms | 197 | Bulk API | PDF |
+| GST Acts | 10 acts, 187+ sections | ID scan + hierarchy | HTML |
+| GST Rules | 10 sets, 160+ rules | Bulk API | HTML |
+| Customs Notifications | 6,872 | ID scan | PDF |
+| Customs Circulars | 1,760 | ID scan | PDF |
+| Customs Instructions | 393 | ID scan | PDF |
 
 ---
 
 ## Changelog
 
+**v2.0 - March 14, 2026**
+- Complete rewrite with data model overview and interconnection graph
+- Added Acts API (metadata, chapters, sections, HTML content)
+- Added Rules API (bulk fetch, chapters, sections)
+- Added Cross-Reference API (`get-related-content`, `fetch-related-content`)
+- Documented Content ID prefix system
+- Added discovery patterns (ID scan vs bulk fetch)
+- Consolidated Notifications/Circulars/Orders/Instructions as common pattern
+
 **v1.2 - March 14, 2026**
-- Added Orders API endpoint (`/api/cbic-order-msts/`)
-- Added Instructions API endpoint (`/api/cbic-instruction-msts/`)
-- Added Forms API endpoints (bulk fetch pattern: `/api/cbic-form-msts/`)
-- Updated statistics: 11,855 total documents across GST + Customs
-- Documented empty-fileName edge case for Forms download
+- Added Orders, Instructions, Forms endpoints
 
 **v1.1 - March 13, 2026**
-- Added Hindi PDF download endpoint (`/HINDI`)
-- Documented Hindi-only notifications (corrigenda)
-- Added language code clarification (use `HINDI`, not `HIN`)
-- Updated download statistics (93/93 Hindi PDFs available for 2025)
+- Added Hindi PDF download, Hindi-only notifications
 
 **v1.0 - March 13, 2026**
-- Initial documentation
-- Documented 3 public endpoints
-- Added ID range and statistics
-- Included implementation examples
+- Initial documentation (Notifications + PDF download)
 
 ---
 
-**Disclaimer:** This documentation is based on reverse engineering and public API exploration. CBIC may change endpoints or add authentication without notice. Use responsibly and respect rate limits.
+**Disclaimer:** Based on reverse engineering of public endpoints. CBIC may change APIs without notice.
